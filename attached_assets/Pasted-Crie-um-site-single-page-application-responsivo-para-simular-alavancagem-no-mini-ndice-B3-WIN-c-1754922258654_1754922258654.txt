@@ -1,0 +1,141 @@
+Crie um site (single-page application) responsivo para simular alavancagem no mini índice B3 (WIN) com dias úteis e até 2 sessões por dia (manhã/tarde).
+Stack sugerida: Vite + React + TypeScript + Tailwind (client-side only). Use Chart.js para gráficos e SheetJS (xlsx) para exportar XLSX. Exporte CSV com URL.createObjectURL.
+
+Objetivo
+Permitir ao usuário configurar parâmetros (incluindo Capital Inicial e Meta de Pontos por Sessão) e simular 3 cenários:
+
+S1 (base): 1 sessão/dia.
+
+S2 (moderado): tarde usa metade dos contratos do “dia seguinte”.
+
+S3 (agressivo): tarde usa 100% dos contratos do “dia seguinte”.
+
+Mostrar tabelas dia a dia, gráficos e resumos, com opção de download CSV/XLSX.
+
+Regras de Negócio (parametrizáveis na UI)
+Defaults (editáveis):
+
+Capital inicial: R$ 2.000,00
+
+Meta de pontos por sessão: 60
+
+Valor do ponto por contrato: R$ 0,20 (WIN)
+
+Risco por contrato: R$ 100,00
+
+# de pregões: 15
+
+Data de início: hoje
+
+Cálculos:
+
+Contratos do dia: ctt_dia = floor(capital / risco_por_contrato)
+
+Lucro por sessão: lucro = contratos * pontos_por_sessao * valor_ponto
+
+“Contratos do dia seguinte” (para política da tarde):
+
+Se houve manhã: capital_mid = capital + lucro_manha
+
+ctt_prox = floor(capital_mid / risco_por_contrato)
+
+S2: ctt_tarde = floor(ctt_prox * 0.5)
+S3: ctt_tarde = ctt_prox
+
+Se não houver manhã naquele pregão: por padrão, tarde usa ctt_dia (contratos do dia corrente).
+
+Tornar isso uma configuração:
+Política quando faltar manhã: {Contratos do dia (default) | Metade do próximo | Próximo inteiro}
+
+Agenda de sessões (dias úteis):
+
+Gerar a série de dias úteis (seg–sex) a partir da data inicial, até completar N pregões.
+
+Permitir desligar manhã/tarde por dia (checkbox por linha).
+
+Opcional: permitir upload CSV com date,morning,afternoon (0/1) — se enviado, sobrescreve os checkboxes.
+
+UI/Fluxo
+Layout em 3 painéis:
+
+Parâmetros
+
+Capital inicial (R$) — input numérico
+
+Meta de pontos por sessão — input numérico
+
+Valor do ponto (R$) — input numérico (default 0.20)
+
+Risco por contrato (R$) — input numérico (default 100)
+
+Nº de pregões — input numérico (default 15)
+
+Data de início — date picker
+
+Política quando não houver manhã (select: “Contratos do dia (default)”, “Metade do próximo”, “Próximo inteiro”)
+
+Botões: Simular, Reset, Importar CSV de sessões (opcional)
+
+Agenda dos Pregões
+
+Tabela gerada automaticamente com as datas úteis
+
+Colunas: #, Data, Manhã [✓], Tarde [✓] (checkbox editável)
+
+Persistir parâmetros e agenda em localStorage
+
+Resultados
+
+Abas ou cards para S1, S2, S3
+
+Em cada cenário, mostrar:
+
+Resumo: Capital final, Ganho total, nº de pregões usados
+
+Gráfico (Chart.js) do Capital ao longo dos pregões
+
+Tabela:
+Data | Capital início | Contratos manhã | Lucro manhã | Contratos tarde | Lucro tarde | Capital fim
+
+Botões Baixar CSV e Baixar XLSX
+
+Um Resumo consolidado comparando S1 x S2 x S3
+
+Validações/Aceitação
+Com defaults e manhã+tarde ativos:
+
+Dia 1 (manhã): ctt = 2000/100 = 20; lucro = 20 * 60 * 0,20 = R$ 240; capital_mid = R$ 2.240,00.
+
+S2/S3 devem calcular ctt_prox a partir de capital_mid e aplicar suas políticas na tarde.
+
+Se um dia tiver apenas manhã ou apenas tarde, aplicar as regras correspondentes (inclusive a política “quando faltar manhã”).
+
+Sempre pular fins de semana. (Feriados: ignorar por ora; opcional aceitar CSV de feriados BR para exclusão.)
+
+Implementação
+Tudo client-side (sem backend).
+
+Estado com React (useZustand/Context opcional).
+
+LocalStorage para salvar entradas e agenda.
+
+Utilitários:
+
+Função gerarDiasUteis(startDate, n) (pular sáb/dom).
+
+Módulo de simulação puro (sem UI) usado pelos 3 cenários.
+
+Exportar:
+
+CSV: gerar via Blob.
+
+XLSX: SheetJS.
+
+Código limpo (TS), componentes reutilizáveis (Card, Table, Form), responsivo (Tailwind).
+Observações:
+
+Capital inicial e Meta de pontos por sessão DEVEM ser editáveis na UI.
+
+Deixe todos os valores com formatação monetária BRL nas tabelas (sem quebrar os cálculos internos).
+
+Otimize para uso em desktop e mobile.
