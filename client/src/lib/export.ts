@@ -39,7 +39,8 @@ export function exportToCSV(scenarioResult: ScenarioResult): void {
 }
 
 export function exportToXLSX(scenarioResult: ScenarioResult): void {
-  if (typeof XLSX === 'undefined') {
+  // @ts-ignore - XLSX is loaded from CDN
+  if (typeof window.XLSX === 'undefined') {
     console.error('XLSX library not loaded');
     return;
   }
@@ -67,22 +68,28 @@ export function exportToXLSX(scenarioResult: ScenarioResult): void {
     ])
   ];
   
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, scenarioResult.scenario);
+  // @ts-ignore - XLSX is loaded from CDN
+  const ws = window.XLSX.utils.aoa_to_sheet(data);
+  // @ts-ignore - XLSX is loaded from CDN
+  const wb = window.XLSX.utils.book_new();
+  // @ts-ignore - XLSX is loaded from CDN
+  window.XLSX.utils.book_append_sheet(wb, ws, scenarioResult.scenario);
   
   // Format currency columns
-  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+  // @ts-ignore - XLSX is loaded from CDN
+  const range = window.XLSX.utils.decode_range(ws['!ref'] || 'A1');
   const currencyColumns = [1, 3, 5, 6]; // Capital Início, Lucro Manhã, Lucro Tarde, Capital Fim
   
   for (let row = 1; row <= range.e.r; row++) {
     currencyColumns.forEach(col => {
-      const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+      // @ts-ignore - XLSX is loaded from CDN
+      const cellAddress = window.XLSX.utils.encode_cell({ r: row, c: col });
       if (ws[cellAddress]) {
         ws[cellAddress].z = '"R$ "#,##0.00';
       }
     });
   }
   
-  XLSX.writeFile(wb, `simulador_${scenarioResult.scenario.toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  // @ts-ignore - XLSX is loaded from CDN
+  window.XLSX.writeFile(wb, `simulador_${scenarioResult.scenario.toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`);
 }

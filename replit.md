@@ -10,6 +10,13 @@ The application simulates trading sessions (morning and afternoon) across busine
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (January 14, 2025)
+
+- Fixed date bug: Corrected date parsing to properly start from selected date (e.g., 14/08 now correctly starts on 14/08)
+- Fixed card sizing: Made cards responsive with flexible text sizing to accommodate larger values
+- Added dark mode: Implemented complete dark mode with toggle button and theme persistence
+- Made header date dynamic: Shows current date that updates daily
+
 ## System Architecture
 
 ### Frontend Architecture

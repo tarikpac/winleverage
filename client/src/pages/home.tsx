@@ -8,13 +8,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useSimulator } from '@/hooks/use-simulator';
+import { useTheme } from '@/hooks/use-theme';
 import { formatCurrency, formatPercentage, formatNumber } from '@/lib/currency';
 import { exportToCSV, exportToXLSX } from '@/lib/export';
 import { ScenarioType } from '@/types/simulator';
-import { ChartLine, Calendar, RotateCcw, Upload, Download, FileSpreadsheet, Play, RotateCcw as Reset } from 'lucide-react';
+import { ChartLine, Calendar, RotateCcw, Upload, Download, FileSpreadsheet, Play, RotateCcw as Reset, Moon, Sun } from 'lucide-react';
 
 export default function Home() {
   const { toast } = useToast();
+  const { theme, toggleTheme } = useTheme();
   const {
     parameters,
     tradingDays,
@@ -35,7 +37,8 @@ export default function Home() {
 
   // Initialize chart
   useEffect(() => {
-    if (chartRef.current && typeof Chart !== 'undefined') {
+    // @ts-ignore - Chart is loaded from CDN
+    if (chartRef.current && typeof window.Chart !== 'undefined') {
       // Destroy existing chart
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
@@ -47,7 +50,8 @@ export default function Home() {
       const labels = results.dailyResults.map(day => day.date);
       const data = results.dailyResults.map(day => day.endCapital);
 
-      chartInstanceRef.current = new Chart(ctx, {
+      // @ts-ignore - Chart is loaded from CDN
+      chartInstanceRef.current = new window.Chart(ctx, {
         type: 'line',
         data: {
           labels,
@@ -156,9 +160,9 @@ export default function Home() {
   const currentResults = simulationResults[activeScenario.toLowerCase() as keyof typeof simulationResults];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
@@ -166,13 +170,27 @@ export default function Home() {
                 <ChartLine className="text-xl h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Simulador WIN B3</h1>
-                <p className="text-sm text-gray-500">Alavancagem Mini Índice</p>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Simulador WIN B3</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Alavancagem Mini Índice</p>
               </div>
             </div>
-            <div className="text-sm text-gray-600">
-              <Calendar className="inline mr-1 h-4 w-4" />
-              <span>{currentDate}</span>
+            <div className="flex items-center space-x-3">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                <Calendar className="inline mr-1 h-4 w-4" />
+                <span>{currentDate}</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="w-9 h-9 p-0"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-4 w-4 text-yellow-500" />
+                ) : (
+                  <Moon className="h-4 w-4 text-gray-600" />
+                )}
+              </Button>
             </div>
           </div>
         </div>
@@ -183,15 +201,15 @@ export default function Home() {
           
           {/* Panel 1: Parameters */}
           <div className="lg:col-span-1 space-y-6">
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-white dark:bg-gray-800 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Parâmetros</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Parâmetros</h2>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={resetParameters}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     <RotateCcw className="h-4 w-4" />
                   </Button>
@@ -324,28 +342,28 @@ export default function Home() {
 
           {/* Panel 2: Trading Schedule */}
           <div className="lg:col-span-1 space-y-6">
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-white dark:bg-gray-800 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Agenda dos Pregões</h2>
-                  <span className="text-sm text-gray-500">{tradingDays.length} dias úteis</span>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Agenda dos Pregões</h2>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{tradingDays.length} dias úteis</span>
                 </div>
                 
                 <div className="overflow-auto max-h-96">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50 sticky top-0">
+                    <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
                       <tr>
-                        <th className="text-left py-2 px-3 font-medium text-gray-700">#</th>
-                        <th className="text-left py-2 px-3 font-medium text-gray-700">Data</th>
-                        <th className="text-center py-2 px-3 font-medium text-gray-700">Manhã</th>
-                        <th className="text-center py-2 px-3 font-medium text-gray-700">Tarde</th>
+                        <th className="text-left py-2 px-3 font-medium text-gray-700 dark:text-gray-300">#</th>
+                        <th className="text-left py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Data</th>
+                        <th className="text-center py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Manhã</th>
+                        <th className="text-center py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Tarde</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                       {tradingDays.map((day, index) => (
-                        <tr key={index} className="hover:bg-gray-50 transition-colors">
-                          <td className="py-2 px-3 text-gray-600">{day.index}</td>
-                          <td className="py-2 px-3 font-medium">{day.dateStr}</td>
+                        <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                          <td className="py-2 px-3 text-gray-600 dark:text-gray-400">{day.index}</td>
+                          <td className="py-2 px-3 font-medium dark:text-gray-300">{day.dateStr}</td>
                           <td className="py-2 px-3 text-center">
                             <Checkbox
                               checked={day.morning}
@@ -382,34 +400,34 @@ export default function Home() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Summary Cards */}
-            <div className="grid grid-cols-3 gap-4">
-              <Card className="bg-white border border-gray-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">{formatCurrency(simulationResults.s1.finalCapital)}</div>
-                  <div className="text-sm text-gray-600">S1 - Base</div>
-                  <div className="text-xs text-green-600 font-medium">{formatPercentage(simulationResults.s1.roi)} ROI</div>
+                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-primary break-words">{formatCurrency(simulationResults.s1.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">S1 - Base</div>
+                  <div className="text-xs text-green-600 dark:text-green-400 font-medium">{formatPercentage(simulationResults.s1.roi)} ROI</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white border border-gray-200">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-400">{formatCurrency(simulationResults.s2.finalCapital)}</div>
-                  <div className="text-sm text-gray-600">S2 - Moderado</div>
-                  <div className="text-xs text-green-600 font-medium">{formatPercentage(simulationResults.s2.roi)} ROI</div>
+                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-400 break-words">{formatCurrency(simulationResults.s2.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">S2 - Moderado</div>
+                  <div className="text-xs text-green-600 dark:text-green-400 font-medium">{formatPercentage(simulationResults.s2.roi)} ROI</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white border border-gray-200">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-orange-500">{formatCurrency(simulationResults.s3.finalCapital)}</div>
-                  <div className="text-sm text-gray-600">S3 - Agressivo</div>
-                  <div className="text-xs text-green-600 font-medium">{formatPercentage(simulationResults.s3.roi)} ROI</div>
+                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-500 break-words">{formatCurrency(simulationResults.s3.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">S3 - Agressivo</div>
+                  <div className="text-xs text-green-600 dark:text-green-400 font-medium">{formatPercentage(simulationResults.s3.roi)} ROI</div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Scenario Tabs */}
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-white dark:bg-gray-800 shadow-sm">
               <Tabs value={activeScenario} onValueChange={(value) => setActiveScenario(value as ScenarioType)}>
-                <div className="border-b border-gray-200">
+                <div className="border-b border-gray-200 dark:border-gray-700">
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="S1" className="text-sm">S1 - Base</TabsTrigger>
                     <TabsTrigger value="S2" className="text-sm">S2 - Moderado</TabsTrigger>
@@ -426,31 +444,31 @@ export default function Home() {
                   {/* Results Table */}
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
-                      <thead className="bg-gray-50">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th className="text-left py-2 px-2 font-medium text-gray-700">Data</th>
-                          <th className="text-right py-2 px-2 font-medium text-gray-700">Cap. Início</th>
-                          <th className="text-right py-2 px-2 font-medium text-gray-700">Ctt M</th>
-                          <th className="text-right py-2 px-2 font-medium text-gray-700">Lucro M</th>
-                          <th className="text-right py-2 px-2 font-medium text-gray-700">Ctt T</th>
-                          <th className="text-right py-2 px-2 font-medium text-gray-700">Lucro T</th>
-                          <th className="text-right py-2 px-2 font-medium text-gray-700">Cap. Fim</th>
+                          <th className="text-left py-2 px-2 font-medium text-gray-700 dark:text-gray-300">Data</th>
+                          <th className="text-right py-2 px-2 font-medium text-gray-700 dark:text-gray-300">Cap. Início</th>
+                          <th className="text-right py-2 px-2 font-medium text-gray-700 dark:text-gray-300">Ctt M</th>
+                          <th className="text-right py-2 px-2 font-medium text-gray-700 dark:text-gray-300">Lucro M</th>
+                          <th className="text-right py-2 px-2 font-medium text-gray-700 dark:text-gray-300">Ctt T</th>
+                          <th className="text-right py-2 px-2 font-medium text-gray-700 dark:text-gray-300">Lucro T</th>
+                          <th className="text-right py-2 px-2 font-medium text-gray-700 dark:text-gray-300">Cap. Fim</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-200 text-xs">
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-xs">
                         {currentResults.dailyResults.map((day, index) => (
-                          <tr key={index} className="hover:bg-gray-50 transition-colors">
-                            <td className="py-2 px-2 font-medium">{day.date}</td>
-                            <td className="py-2 px-2 text-right">{formatCurrency(day.startCapital)}</td>
-                            <td className="py-2 px-2 text-right">{day.morningContracts || '-'}</td>
-                            <td className="py-2 px-2 text-right text-green-600">
+                          <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <td className="py-2 px-2 font-medium dark:text-gray-300">{day.date}</td>
+                            <td className="py-2 px-2 text-right dark:text-gray-300">{formatCurrency(day.startCapital)}</td>
+                            <td className="py-2 px-2 text-right dark:text-gray-300">{day.morningContracts || '-'}</td>
+                            <td className="py-2 px-2 text-right text-green-600 dark:text-green-400">
                               {day.morningProfit ? formatCurrency(day.morningProfit) : '-'}
                             </td>
-                            <td className="py-2 px-2 text-right">{day.afternoonContracts || '-'}</td>
-                            <td className="py-2 px-2 text-right text-green-600">
+                            <td className="py-2 px-2 text-right dark:text-gray-300">{day.afternoonContracts || '-'}</td>
+                            <td className="py-2 px-2 text-right text-green-600 dark:text-green-400">
                               {day.afternoonProfit ? formatCurrency(day.afternoonProfit) : '-'}
                             </td>
-                            <td className="py-2 px-2 text-right font-medium">{formatCurrency(day.endCapital)}</td>
+                            <td className="py-2 px-2 text-right font-medium dark:text-gray-200">{formatCurrency(day.endCapital)}</td>
                           </tr>
                         ))}
                       </tbody>

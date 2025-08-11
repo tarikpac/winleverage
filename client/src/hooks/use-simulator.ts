@@ -58,7 +58,10 @@ export function useSimulator() {
 
   // Generate trading days when parameters change
   useEffect(() => {
-    const businessDays = generateBusinessDays(new Date(parameters.startDate), parameters.tradingDays);
+    // Parse the date properly to avoid timezone issues
+    const [year, month, day] = parameters.startDate.split('-').map(Number);
+    const startDate = new Date(year, month - 1, day); // month is 0-indexed
+    const businessDays = generateBusinessDays(startDate, parameters.tradingDays);
     const newTradingDays = businessDays.map((date, index) => ({
       index: index + 1,
       date,
