@@ -180,7 +180,7 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-3">
               <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                <Calendar className="inline mr-1 h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <CalendarIcon className="inline mr-1 h-4 w-4 text-gray-600 dark:text-gray-400" />
                 <span>{currentDate}</span>
               </div>
               <Button
@@ -201,7 +201,7 @@ export default function Home() {
       </header>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6">
           
           {/* Panel 1: Parameters */}
           <div className="lg:col-span-1 space-y-6">
@@ -310,7 +310,7 @@ export default function Home() {
                         avoidCollisions={true}
                         collisionPadding={8}
                       >
-                        <Calendar
+                         <Calendar
                           mode="single"
                           selected={parameters.startDate ? new Date(parameters.startDate + 'T00:00:00') : undefined}
                           onSelect={(date) => {
@@ -319,9 +319,7 @@ export default function Home() {
                               updateParameters({ startDate: formattedDate });
                             }
                           }}
-                          disabled={(date) => {
-                            return date < new Date("2020-01-01");
-                          }}
+                          disabled={(date) => date < new Date("2000-01-01")}
                           initialFocus
                         />
                       </PopoverContent>
@@ -377,10 +375,8 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Panel 2: Trading Schedule */}
-          <div className="lg:col-span-1 space-y-6">
+            {/* Panel 2: Trading Schedule */}
             <Card className="bg-white dark:bg-gray-800 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -462,30 +458,31 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
+
           </div>
 
           {/* Panel 3: Results */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6">
             
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 min-w-0">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <CardContent className="p-4 text-center">
-                  <div className="text-base lg:text-lg xl:text-xl font-bold text-primary whitespace-nowrap overflow-hidden text-ellipsis">{formatCurrency(simulationResults.s1.finalCapital)}</div>
+                  <div className="text-base lg:text-lg xl:text-xl font-bold text-primary whitespace-nowrap">{formatCurrency(simulationResults.s1.finalCapital)}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">S1 - Base</div>
                   <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s1.roi)} ROI</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 min-w-0">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                 <CardContent className="p-4 text-center">
-                  <div className="text-base lg:text-lg xl:text-xl font-bold text-blue-400 whitespace-nowrap overflow-hidden text-ellipsis">{formatCurrency(simulationResults.s2.finalCapital)}</div>
+                  <div className="text-base lg:text-lg xl:text-xl font-bold text-blue-400 whitespace-nowrap">{formatCurrency(simulationResults.s2.finalCapital)}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">S2 - Moderado</div>
                   <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s2.roi)} ROI</div>
                 </CardContent>
               </Card>
               <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 min-w-0">
                 <CardContent className="p-4 text-center">
-                  <div className="text-base lg:text-lg xl:text-xl font-bold text-orange-500 whitespace-nowrap overflow-hidden text-ellipsis">{formatCurrency(simulationResults.s3.finalCapital)}</div>
+                  <div className="text-base lg:text-lg xl:text-xl font-bold text-orange-500 whitespace-nowrap">{formatCurrency(simulationResults.s3.finalCapital)}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">S3 - Agressivo</div>
                   <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s3.roi)} ROI</div>
                 </CardContent>
@@ -505,14 +502,13 @@ export default function Home() {
 
                 <CardContent className="p-4">
                   {/* Chart */}
-                  <div className="mb-6 h-64">
+                  <div className="relative z-0 mb-6 h-64 md:h-80">
                     <canvas ref={chartRef} className="w-full h-full"></canvas>
                   </div>
 
                   {/* Results Table */}
-                  <div className="overflow-x-auto -mx-4">
-                    <div className="inline-block min-w-full px-4">
-                      <table className="w-full text-xs md:text-sm">
+                  <div className="relative z-10 overflow-x-auto md:overflow-x-visible bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <table className="min-w-full w-full text-xs md:text-sm table-auto">
                         <thead className="bg-gray-50 dark:bg-gray-700">
                           <tr>
                             <th className="text-left py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Data</th>
@@ -542,7 +538,6 @@ export default function Home() {
                           ))}
                         </tbody>
                       </table>
-                    </div>
                   </div>
 
                   {/* Export Buttons */}

@@ -36,11 +36,12 @@ export function simulateScenario(
     // Afternoon session
     if (day.afternoon) {
       let contractsForAfternoon = 0;
-      
+
       if (scenario === 'S1') {
-        // S1: Always use current day contracts
-        contractsForAfternoon = day.morning 
-          ? calculateContracts(currentCapital, riskPerContract)
+        // S1 (Base): contratos da tarde iguais aos da manhã quando houver;
+        // se não houver manhã, usa contratos calculados pelo capital do dia (startCapital).
+        contractsForAfternoon = day.morning
+          ? morningContracts
           : calculateContracts(startCapital, riskPerContract);
       } else {
         // S2 and S3: Use "next day" logic
@@ -69,7 +70,7 @@ export function simulateScenario(
           }
         }
       }
-      
+
       afternoonContracts = contractsForAfternoon;
       afternoonProfit = calculateProfit(afternoonContracts, targetPoints, pointValue);
       currentCapital += afternoonProfit;
