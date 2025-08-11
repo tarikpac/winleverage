@@ -301,10 +301,14 @@ export default function Home() {
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent 
-                        className="w-auto p-0 z-50" 
+                        className="w-auto p-0 z-[100]" 
                         align="start"
-                        sideOffset={5}
+                        side="bottom"
+                        sideOffset={4}
+                        alignOffset={0}
                         onOpenAutoFocus={(e) => e.preventDefault()}
+                        avoidCollisions={true}
+                        collisionPadding={8}
                       >
                         <Calendar
                           mode="single"
@@ -316,9 +320,7 @@ export default function Home() {
                             }
                           }}
                           disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(23, 59, 59, 999);
-                            return date > today || date < new Date("2020-01-01");
+                            return date < new Date("2020-01-01");
                           }}
                           initialFocus
                         />
@@ -466,25 +468,25 @@ export default function Home() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 min-w-0">
                 <CardContent className="p-4 text-center">
-                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-primary whitespace-nowrap">{formatCurrency(simulationResults.s1.finalCapital)}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S1 - Base</div>
+                  <div className="text-base lg:text-lg xl:text-xl font-bold text-primary whitespace-nowrap overflow-hidden text-ellipsis">{formatCurrency(simulationResults.s1.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">S1 - Base</div>
                   <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s1.roi)} ROI</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 min-w-0">
                 <CardContent className="p-4 text-center">
-                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-400 whitespace-nowrap">{formatCurrency(simulationResults.s2.finalCapital)}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S2 - Moderado</div>
+                  <div className="text-base lg:text-lg xl:text-xl font-bold text-blue-400 whitespace-nowrap overflow-hidden text-ellipsis">{formatCurrency(simulationResults.s2.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">S2 - Moderado</div>
                   <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s2.roi)} ROI</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 min-w-0">
                 <CardContent className="p-4 text-center">
-                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-500 whitespace-nowrap">{formatCurrency(simulationResults.s3.finalCapital)}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S3 - Agressivo</div>
+                  <div className="text-base lg:text-lg xl:text-xl font-bold text-orange-500 whitespace-nowrap overflow-hidden text-ellipsis">{formatCurrency(simulationResults.s3.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">S3 - Agressivo</div>
                   <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s3.roi)} ROI</div>
                 </CardContent>
               </Card>
@@ -501,50 +503,46 @@ export default function Home() {
                   </TabsList>
                 </div>
 
-                <CardContent className="p-2 lg:p-4">
+                <CardContent className="p-4">
                   {/* Chart */}
-                  <div className="mb-6 h-48">
+                  <div className="mb-6 h-64">
                     <canvas ref={chartRef} className="w-full h-full"></canvas>
                   </div>
 
                   {/* Results Table */}
-                  <div className="overflow-x-auto md:overflow-x-visible">
-                    <table className="w-full text-xs md:text-sm">
-                      <thead className="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                          <th className="text-left py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Data</th>
-                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">
-                            <span className="hidden md:inline">Cap. Início</span>
-                            <span className="md:hidden">Início</span>
-                          </th>
-                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Ctt M</th>
-                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Lucro M</th>
-                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Ctt T</th>
-                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Lucro T</th>
-                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">
-                            <span className="hidden md:inline">Cap. Fim</span>
-                            <span className="md:hidden">Fim</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-xs md:text-sm">
-                        {currentResults.dailyResults.map((day, index) => (
-                          <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                            <td className="py-2 px-2 md:px-3 font-medium dark:text-gray-300">{day.date}</td>
-                            <td className="py-2 px-2 md:px-3 text-right dark:text-gray-300 whitespace-nowrap">{formatCurrency(day.startCapital)}</td>
-                            <td className="py-2 px-2 md:px-3 text-right dark:text-gray-300">{day.morningContracts || '-'}</td>
-                            <td className="py-2 px-2 md:px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
-                              {day.morningProfit ? formatCurrency(day.morningProfit) : '-'}
-                            </td>
-                            <td className="py-2 px-2 md:px-3 text-right dark:text-gray-300">{day.afternoonContracts || '-'}</td>
-                            <td className="py-2 px-2 md:px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
-                              {day.afternoonProfit ? formatCurrency(day.afternoonProfit) : '-'}
-                            </td>
-                            <td className="py-2 px-2 md:px-3 text-right font-medium dark:text-gray-200 whitespace-nowrap">{formatCurrency(day.endCapital)}</td>
+                  <div className="overflow-x-auto -mx-4">
+                    <div className="inline-block min-w-full px-4">
+                      <table className="w-full text-xs md:text-sm">
+                        <thead className="bg-gray-50 dark:bg-gray-700">
+                          <tr>
+                            <th className="text-left py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Data</th>
+                            <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Início</th>
+                            <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Ctt M</th>
+                            <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro M</th>
+                            <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Ctt T</th>
+                            <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro T</th>
+                            <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Fim</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-xs md:text-sm">
+                          {currentResults.dailyResults.map((day, index) => (
+                            <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                              <td className="py-2 px-3 font-medium dark:text-gray-300 whitespace-nowrap">{day.date}</td>
+                              <td className="py-2 px-3 text-right dark:text-gray-300 whitespace-nowrap">{formatCurrency(day.startCapital)}</td>
+                              <td className="py-2 px-3 text-right dark:text-gray-300">{day.morningContracts || '-'}</td>
+                              <td className="py-2 px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
+                                {day.morningProfit ? formatCurrency(day.morningProfit) : '-'}
+                              </td>
+                              <td className="py-2 px-3 text-right dark:text-gray-300">{day.afternoonContracts || '-'}</td>
+                              <td className="py-2 px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
+                                {day.afternoonProfit ? formatCurrency(day.afternoonProfit) : '-'}
+                              </td>
+                              <td className="py-2 px-3 text-right font-medium dark:text-gray-200 whitespace-nowrap">{formatCurrency(day.endCapital)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
 
                   {/* Export Buttons */}

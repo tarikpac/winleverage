@@ -16,6 +16,11 @@ Preferred communication style: Simple, everyday language.
 - Fixed card sizing: Made cards responsive with flexible text sizing to accommodate larger values
 - Added dark mode: Implemented complete dark mode with toggle button and theme persistence
 - Made header date dynamic: Shows current date that updates daily
+- Fixed datepicker: Now properly anchored to input field with collision detection
+- Removed date restrictions: Users can now select future dates for simulations
+- Improved table layout: Fixed width issues and background coverage
+- Added separate toggle buttons: Morning and afternoon sessions can be toggled independently
+- Enhanced desktop layout: Removed unnecessary scrollbars, increased container width to 1440px
 
 ## System Architecture
 

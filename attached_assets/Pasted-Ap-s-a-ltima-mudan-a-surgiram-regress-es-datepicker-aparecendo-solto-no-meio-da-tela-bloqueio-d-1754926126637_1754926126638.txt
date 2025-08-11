@@ -1,0 +1,77 @@
+Após a última mudança surgiram regressões: datepicker aparecendo “solto” no meio da tela, bloqueio de datas futuras, valores dos KPIs/ROI quebrando linha, e tabela estourando o fundo (fundo não acompanha a largura). Corrigir com as especificações abaixo.
+
+1) Datepicker ancorado ao campo e único na página
+O calendário deve abrir somente ao clicar/focar no campo “Data de Início” e fechar em clique fora/ESC.
+
+Ancoragem: posicionamento relativo ao input em bottom-start, com detecção de colisão nas bordas.
+
+Portal: renderizar o popover do calendário via portal/teleport em document.body para evitar clipping, mas posicionando pelas coordenadas do input (não centralizado).
+
+Z-index: garantir nível acima dos cards, porém abaixo de modais globais (stack do app).
+
+Instância única: não deixar nenhum calendário residual no DOM. Auditar: remover qualquer instância “global” fixa/absoluta que esteja sendo montada fora do fluxo do input.
+
+Critérios de aceitação:
+
+Clique no campo → calendário aparece colado ao campo (não no meio da tela).
+
+Selecionar a data fecha o popover e atualiza o campo.
+
+Clicar fora/ESC fecha o calendário.
+
+Não há calendário “avulso” visível em nenhuma rota/aba.
+
+2) Datas futuras liberadas
+Remover restrição indevida de maxDate = hoje. O usuário precisa selecionar datas posteriores (ex.: 15/08, 16/08 etc).
+
+Manter pulo de fins de semana nos cálculos de pregões, mas não bloquear a seleção dessas datas no datepicker (o bloqueio é lógico no gerador de agenda).
+
+Critério de aceitação: conseguir selecionar qualquer data futura do mês corrente e subsequentes.
+
+3) KPIs/ROI (cards superiores) — sem quebra de linha e sem overflow
+Em desktop (≥ 1280px), os cards não podem ter rolagem interna nem quebrar os valores (R$ e ROI).
+
+Ajustes:
+
+Garantir grid/flex com wrap para distribuir os cards; sem carrossel e sem overflow-x.
+
+Impedir quebra dentro dos números e do “R$” (no-wrap para os valores**)**.
+
+Espaçamentos consistentes e altura mínima para que título, valor e subtítulo caibam sem colidir.
+
+Critério de aceitação:
+
+Em 1440×900 e 1920×1080, todos os cards exibem valor inteiro na mesma linha, sem truncar, sem barra de rolagem interna.
+
+4) Tabela — fundo deve acompanhar a largura
+O Card/Container da tabela deve cobrir toda a largura real do conteúdo (gráfico + tabela + botões), sem “vazar” para fora do fundo branco.
+
+Ajustes:
+
+Garantir que o wrapper do conteúdo (CardContent ou equivalente) tenha mesma largura da tabela/grafico e fundo aplicado no wrapper correto (não apenas na tabela).
+
+Remover overflow/max-width conflitantes que fazem a tabela ultrapassar o fundo.
+
+Em desktop, sem altura fixa que gere rolagem interna; a rolagem deve ser do documento.
+
+Critério de aceitação:
+
+As colunas da direita (“Lucro T”, “Cap. Fim”) ficam 100% dentro do fundo do card.
+
+Nenhuma barra de rolagem interna no card da tabela em desktop.
+
+5) Revisão de overflow e container (desktop)
+Container principal em desktop com largura máxima ~1440px (ou superior, se necessário), centralizado, evitando scroll horizontal.
+
+Em desktop:
+
+Remover overflow-[auto|x|y] nos cards principais (KPIs e Tabela).
+
+Remover max-h/alturas fixas nesses cards; deixar o documento rolar.
+
+Em mobile, manter rolagem interna apenas se necessário (com limites claros de altura).
+Não “esconder” scrollbars com CSS; a correção é estrutural (layout/containers/portal).
+
+Não fixar alturas em desktop para “forçar caber”.
+
+Não centralizar o datepicker por position: fixed ou semelhante; sempre ancorado ao input.
