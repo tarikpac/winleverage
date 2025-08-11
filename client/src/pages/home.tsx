@@ -6,13 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 import { useSimulator } from '@/hooks/use-simulator';
 import { useTheme } from '@/hooks/use-theme';
 import { formatCurrency, formatPercentage, formatNumber } from '@/lib/currency';
 import { exportToCSV, exportToXLSX } from '@/lib/export';
 import { ScenarioType } from '@/types/simulator';
-import { ChartLine, Calendar, RotateCcw, Upload, Download, FileSpreadsheet, Play, RotateCcw as Reset, Moon, Sun } from 'lucide-react';
+import { ChartLine, Calendar as CalendarIcon, RotateCcw, Upload, Download, FileSpreadsheet, Play, RotateCcw as Reset, Moon, Sun } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 export default function Home() {
   const { toast } = useToast();
@@ -281,12 +285,38 @@ export default function Home() {
 
                   <div>
                     <Label htmlFor="startDate">Data de Início</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={parameters.startDate}
-                      onChange={(e) => updateParameters({ startDate: e.target.value })}
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-between text-left font-normal hover:bg-gray-50 dark:hover:bg-gray-700",
+                            !parameters.startDate && "text-muted-foreground"
+                          )}
+                        >
+                          <span className="flex-1">
+                            {parameters.startDate ? format(new Date(parameters.startDate + 'T00:00:00'), 'dd/MM/yyyy') : "Clique para selecionar"}
+                          </span>
+                          <CalendarIcon className="h-4 w-4 opacity-50 dark:opacity-70" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={parameters.startDate ? new Date(parameters.startDate + 'T00:00:00') : undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              const formattedDate = format(date, 'yyyy-MM-dd');
+                              updateParameters({ startDate: formattedDate });
+                            }
+                          }}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("2020-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <div>
@@ -346,22 +376,36 @@ export default function Home() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Agenda dos Pregões</h2>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const allChecked = tradingDays.every(day => day.morning && day.afternoon);
-                        tradingDays.forEach((_, index) => {
-                          updateTradingDay(index, { morning: !allChecked, afternoon: !allChecked });
-                        });
-                      }}
-                      className="text-xs px-2 py-1"
-                    >
-                      {tradingDays.every(day => day.morning && day.afternoon) ? 'Desmarcar' : 'Marcar'} Todas
-                    </Button>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{tradingDays.length} dias</span>
-                  </div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{tradingDays.length} dias úteis</span>
+                </div>
+                
+                <div className="flex gap-2 mb-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const allMorningChecked = tradingDays.every(day => day.morning);
+                      tradingDays.forEach((_, index) => {
+                        updateTradingDay(index, { morning: !allMorningChecked });
+                      });
+                    }}
+                    className="text-xs px-2 py-1 flex-1"
+                  >
+                    {tradingDays.every(day => day.morning) ? 'Desmarcar' : 'Marcar'} Manhãs
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const allAfternoonChecked = tradingDays.every(day => day.afternoon);
+                      tradingDays.forEach((_, index) => {
+                        updateTradingDay(index, { afternoon: !allAfternoonChecked });
+                      });
+                    }}
+                    className="text-xs px-2 py-1 flex-1"
+                  >
+                    {tradingDays.every(day => day.afternoon) ? 'Desmarcar' : 'Marcar'} Tardes
+                  </Button>
                 </div>
                 
                 <div className="overflow-auto max-h-96">
@@ -415,28 +459,30 @@ export default function Home() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <CardContent className="p-4 text-center min-w-0">
-                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-primary whitespace-nowrap">{formatCurrency(simulationResults.s1.finalCapital)}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">S1 - Base</div>
-                  <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s1.roi)} ROI</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <CardContent className="p-4 text-center min-w-0">
-                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-400 whitespace-nowrap">{formatCurrency(simulationResults.s2.finalCapital)}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">S2 - Moderado</div>
-                  <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s2.roi)} ROI</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <CardContent className="p-4 text-center min-w-0">
-                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-500 whitespace-nowrap">{formatCurrency(simulationResults.s3.finalCapital)}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">S3 - Agressivo</div>
-                  <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s3.roi)} ROI</div>
-                </CardContent>
-              </Card>
+            <div className="flex flex-col gap-4 overflow-x-auto">
+              <div className="flex gap-4 min-w-max">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex-1">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-lg lg:text-xl xl:text-2xl font-bold text-primary whitespace-nowrap">{formatCurrency(simulationResults.s1.finalCapital)}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S1 - Base</div>
+                    <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s1.roi)} ROI</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex-1">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-400 whitespace-nowrap">{formatCurrency(simulationResults.s2.finalCapital)}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S2 - Moderado</div>
+                    <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s2.roi)} ROI</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex-1">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-500 whitespace-nowrap">{formatCurrency(simulationResults.s3.finalCapital)}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S3 - Agressivo</div>
+                    <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s3.roi)} ROI</div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
 
             {/* Scenario Tabs */}
@@ -450,44 +496,46 @@ export default function Home() {
                   </TabsList>
                 </div>
 
-                <CardContent className="p-6">
+                <CardContent className="p-2 lg:p-4">
                   {/* Chart */}
                   <div className="mb-6 h-48">
                     <canvas ref={chartRef} className="w-full h-full"></canvas>
                   </div>
 
                   {/* Results Table */}
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs">
-                      <thead className="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                          <th className="text-left py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Data</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Início</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Ctt M</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro M</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Ctt T</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro T</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Fim</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-xs">
-                        {currentResults.dailyResults.map((day, index) => (
-                          <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                            <td className="py-2 px-3 font-medium dark:text-gray-300 whitespace-nowrap">{day.date}</td>
-                            <td className="py-2 px-3 text-right dark:text-gray-300 whitespace-nowrap">{formatCurrency(day.startCapital)}</td>
-                            <td className="py-2 px-3 text-right dark:text-gray-300 whitespace-nowrap">{day.morningContracts || '-'}</td>
-                            <td className="py-2 px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
-                              {day.morningProfit ? formatCurrency(day.morningProfit) : '-'}
-                            </td>
-                            <td className="py-2 px-3 text-right dark:text-gray-300 whitespace-nowrap">{day.afternoonContracts || '-'}</td>
-                            <td className="py-2 px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
-                              {day.afternoonProfit ? formatCurrency(day.afternoonProfit) : '-'}
-                            </td>
-                            <td className="py-2 px-3 text-right font-medium dark:text-gray-200 whitespace-nowrap">{formatCurrency(day.endCapital)}</td>
+                  <div className="overflow-x-auto -mx-2 lg:-mx-4">
+                    <div className="min-w-[700px]">
+                      <table className="w-full text-xs">
+                        <thead className="bg-gray-50 dark:bg-gray-700">
+                          <tr>
+                            <th className="text-left py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Data</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Início</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Ctt M</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro M</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Ctt T</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro T</th>
+                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Fim</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-xs">
+                          {currentResults.dailyResults.map((day, index) => (
+                            <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                              <td className="py-2 px-4 font-medium dark:text-gray-300 whitespace-nowrap">{day.date}</td>
+                              <td className="py-2 px-4 text-right dark:text-gray-300 whitespace-nowrap">{formatCurrency(day.startCapital)}</td>
+                              <td className="py-2 px-4 text-right dark:text-gray-300 whitespace-nowrap">{day.morningContracts || '-'}</td>
+                              <td className="py-2 px-4 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
+                                {day.morningProfit ? formatCurrency(day.morningProfit) : '-'}
+                              </td>
+                              <td className="py-2 px-4 text-right dark:text-gray-300 whitespace-nowrap">{day.afternoonContracts || '-'}</td>
+                              <td className="py-2 px-4 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
+                                {day.afternoonProfit ? formatCurrency(day.afternoonProfit) : '-'}
+                              </td>
+                              <td className="py-2 px-4 text-right font-medium dark:text-gray-200 whitespace-nowrap">{formatCurrency(day.endCapital)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
 
                   {/* Export Buttons */}
