@@ -1,0 +1,55 @@
+Corrigir calendário/datepicker e layout desktop para eliminar barras de rolagem internas nos cards.
+
+1) Datepicker ancorado ao input (sem “flutuar no meio da tela”)
+Ao clicar em qualquer área do campo “Data de Início” (label, ícone, container), abrir o datepicker.
+
+O popover do calendário deve:
+
+Ficar ancorado ao input (posição bottom-start) com cálculo de colisão nas bordas da viewport.
+
+Renderizar via portal em document.body para evitar clipping por containers com overflow.
+
+Ter z-index alto (nível de overlay do app) e fechar em outside click e tecla Esc.
+
+Se já houver uma lib de datepicker, ativar/ajustar: posicionamento com popper, portal/teleport, close on blur/escape, open on focus/click.
+
+Critério de aceitação: ao clicar no campo, o calendário aparece imediatamente colado ao input, nunca centralizado na página; fecha ao clicar fora/Esc.
+
+2) Remover barras internas em desktop (cards de ROI e card da Tabela)
+Em breakpoint ≥ md:
+
+Remover qualquer overflow-auto / overflow-x-auto / overflow-y-auto nos cards de ROI e no card da Tabela.
+
+Remover max-h/alturas fixas nesses cards para desktop; permitir que o scroll seja do documento/página.
+
+Manter rolagem interna apenas em mobile (≤ md), se necessário.
+
+Cards de ROI (topo):
+
+Substituir layouts que forcem rolagem horizontal por grid/flex com wrap em desktop (sem carrossel).
+
+Garantir que todos os KPIs/ROI fiquem visíveis sem scroll interno em resoluções ≥ 1280px.
+
+Card da Tabela (baixo):
+
+Em desktop, conteúdo completo visível sem barra interna; somente a página rola.
+
+Evitar min-width exagerado nas colunas; usar nowrap para números e permitir quebra em títulos longos para eliminar scroll horizontal.
+
+Gráfico dentro do card:
+
+Definir altura mínima responsiva para não estourar o layout e não forçar scroll interno do card.
+
+Critério de aceitação: nas resoluções 1440×900 e 1920×1080, não existem barras internas (como as duas marcadas nas capturas). A página rola suavemente.
+
+3) Container e largura de layout em desktop
+Usar container central com largura máxima ampla (ex.: ~1440px) para caber KPIs, gráfico e tabela sem scroll interno.
+
+Onde houver wrappers com overflow-x-auto para “resolver” layout, reestruturar o grid para evitar dependência de scroll horizontal.
+
+4) Interações e acessibilidade
+Foco no input abre o calendário; Tab/Shift+Tab navega sem prender o foco no popover.
+
+Fechamento do calendário preserva o foco no input para consistência.
+
+Não ocultar barras via CSS de scrollbar; a correção deve ser estrutural (layout/posicionamento).

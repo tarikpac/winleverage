@@ -167,7 +167,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="bg-primary text-white rounded-lg p-2">
@@ -200,7 +200,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Panel 1: Parameters */}
@@ -300,7 +300,12 @@ export default function Home() {
                           <CalendarIcon className="h-4 w-4 opacity-50 dark:opacity-70" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent 
+                        className="w-auto p-0 z-50" 
+                        align="start"
+                        sideOffset={5}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                      >
                         <Calendar
                           mode="single"
                           selected={parameters.startDate ? new Date(parameters.startDate + 'T00:00:00') : undefined}
@@ -310,9 +315,11 @@ export default function Home() {
                               updateParameters({ startDate: formattedDate });
                             }
                           }}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("2020-01-01")
-                          }
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(23, 59, 59, 999);
+                            return date > today || date < new Date("2020-01-01");
+                          }}
                           initialFocus
                         />
                       </PopoverContent>
@@ -408,9 +415,9 @@ export default function Home() {
                   </Button>
                 </div>
                 
-                <div className="overflow-auto max-h-96">
+                <div className="overflow-auto max-h-96 md:max-h-none md:overflow-visible">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
+                    <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0 md:static">
                       <tr>
                         <th className="text-left py-2 px-3 font-medium text-gray-700 dark:text-gray-300">#</th>
                         <th className="text-left py-2 px-3 font-medium text-gray-700 dark:text-gray-300">Data</th>
@@ -459,30 +466,28 @@ export default function Home() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Summary Cards */}
-            <div className="flex flex-col gap-4 overflow-x-auto">
-              <div className="flex gap-4 min-w-max">
-                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex-1">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-lg lg:text-xl xl:text-2xl font-bold text-primary whitespace-nowrap">{formatCurrency(simulationResults.s1.finalCapital)}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S1 - Base</div>
-                    <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s1.roi)} ROI</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex-1">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-400 whitespace-nowrap">{formatCurrency(simulationResults.s2.finalCapital)}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S2 - Moderado</div>
-                    <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s2.roi)} ROI</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex-1">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-500 whitespace-nowrap">{formatCurrency(simulationResults.s3.finalCapital)}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S3 - Agressivo</div>
-                    <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s3.roi)} ROI</div>
-                  </CardContent>
-                </Card>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <CardContent className="p-4 text-center">
+                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-primary whitespace-nowrap">{formatCurrency(simulationResults.s1.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S1 - Base</div>
+                  <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s1.roi)} ROI</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <CardContent className="p-4 text-center">
+                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-blue-400 whitespace-nowrap">{formatCurrency(simulationResults.s2.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S2 - Moderado</div>
+                  <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s2.roi)} ROI</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <CardContent className="p-4 text-center">
+                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-orange-500 whitespace-nowrap">{formatCurrency(simulationResults.s3.finalCapital)}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">S3 - Agressivo</div>
+                  <div className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">{formatPercentage(simulationResults.s3.roi)} ROI</div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Scenario Tabs */}
@@ -503,39 +508,43 @@ export default function Home() {
                   </div>
 
                   {/* Results Table */}
-                  <div className="overflow-x-auto -mx-2 lg:-mx-4">
-                    <div className="min-w-[700px]">
-                      <table className="w-full text-xs">
-                        <thead className="bg-gray-50 dark:bg-gray-700">
-                          <tr>
-                            <th className="text-left py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Data</th>
-                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Início</th>
-                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Ctt M</th>
-                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro M</th>
-                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Ctt T</th>
-                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Lucro T</th>
-                            <th className="text-right py-2 px-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Cap. Fim</th>
+                  <div className="overflow-x-auto md:overflow-x-visible">
+                    <table className="w-full text-xs md:text-sm">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                          <th className="text-left py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Data</th>
+                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">
+                            <span className="hidden md:inline">Cap. Início</span>
+                            <span className="md:hidden">Início</span>
+                          </th>
+                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Ctt M</th>
+                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Lucro M</th>
+                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Ctt T</th>
+                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">Lucro T</th>
+                          <th className="text-right py-2 px-2 md:px-3 font-medium text-gray-700 dark:text-gray-300">
+                            <span className="hidden md:inline">Cap. Fim</span>
+                            <span className="md:hidden">Fim</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-xs md:text-sm">
+                        {currentResults.dailyResults.map((day, index) => (
+                          <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <td className="py-2 px-2 md:px-3 font-medium dark:text-gray-300">{day.date}</td>
+                            <td className="py-2 px-2 md:px-3 text-right dark:text-gray-300 whitespace-nowrap">{formatCurrency(day.startCapital)}</td>
+                            <td className="py-2 px-2 md:px-3 text-right dark:text-gray-300">{day.morningContracts || '-'}</td>
+                            <td className="py-2 px-2 md:px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
+                              {day.morningProfit ? formatCurrency(day.morningProfit) : '-'}
+                            </td>
+                            <td className="py-2 px-2 md:px-3 text-right dark:text-gray-300">{day.afternoonContracts || '-'}</td>
+                            <td className="py-2 px-2 md:px-3 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
+                              {day.afternoonProfit ? formatCurrency(day.afternoonProfit) : '-'}
+                            </td>
+                            <td className="py-2 px-2 md:px-3 text-right font-medium dark:text-gray-200 whitespace-nowrap">{formatCurrency(day.endCapital)}</td>
                           </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 text-xs">
-                          {currentResults.dailyResults.map((day, index) => (
-                            <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                              <td className="py-2 px-4 font-medium dark:text-gray-300 whitespace-nowrap">{day.date}</td>
-                              <td className="py-2 px-4 text-right dark:text-gray-300 whitespace-nowrap">{formatCurrency(day.startCapital)}</td>
-                              <td className="py-2 px-4 text-right dark:text-gray-300 whitespace-nowrap">{day.morningContracts || '-'}</td>
-                              <td className="py-2 px-4 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
-                                {day.morningProfit ? formatCurrency(day.morningProfit) : '-'}
-                              </td>
-                              <td className="py-2 px-4 text-right dark:text-gray-300 whitespace-nowrap">{day.afternoonContracts || '-'}</td>
-                              <td className="py-2 px-4 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
-                                {day.afternoonProfit ? formatCurrency(day.afternoonProfit) : '-'}
-                              </td>
-                              <td className="py-2 px-4 text-right font-medium dark:text-gray-200 whitespace-nowrap">{formatCurrency(day.endCapital)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
 
                   {/* Export Buttons */}
@@ -561,7 +570,7 @@ export default function Home() {
             <CardContent className="p-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Resumo Comparativo</h2>
               
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto md:overflow-x-visible">
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
