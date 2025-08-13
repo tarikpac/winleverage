@@ -1,0 +1,35 @@
+{pkgs}: {
+  deps = [
+    pkgs.atkmm_2_36
+    pkgs.atkmm
+    pkgs.google-chrome
+    pkgs.chromium
+    pkgs.nss
+    pkgs.nspr
+    pkgs.glib
+    pkgs.gtk3
+    pkgs.pango
+    pkgs.cairo
+    pkgs.libdrm
+    pkgs.alsaLib
+    pkgs.at-spi2-core
+    pkgs.cups
+    pkgs.dbus
+    pkgs.libxkbcommon
+    pkgs.libgbm
+    pkgs.libxcb
+    pkgs.fontconfig
+    pkgs.freetype
+    pkgs.harfbuzz
+    pkgs.zlib
+    pkgs.xorg.libX11
+    pkgs.xorg.libXcomposite
+    pkgs.xorg.libXdamage
+    pkgs.xorg.libXext
+    pkgs.xorg.libXfixes
+    pkgs.xorg.libXrandr
+    pkgs.xorg.libXrender
+    pkgs.xorg.libXcursor
+    pkgs.xorg.libXi
+  ];
+}

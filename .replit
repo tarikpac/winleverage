@@ -4,6 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["chromium", "nss", "glib", "gtk3", "pango", "cairo", "libdrm", "alsa-lib", "at-spi2-core", "xorg-autoconf", "xorg.xorgserver", "xorg.xorgsgmldoctools", "xorg.xorgcffiles", "xorg.xorgdocs", "xorg.xorgproto", "xorg_sys_opengl", "chromium-xorg-conf", "xdg-desktop-portal-gtk", "xorg.xcursorgen", "xorg.libxcb", "fontconfig", "freetype", "harfbuzz", "zlib", "xorg.libXcursor", "xorg.libXrender", "xorg.libXi", "xorg.libXfixes", "xorg.libXrandr", "xorg.libXdamage", "xorg.libXcomposite", "xorg.libX11"]
 
 [deployment]
 deploymentTarget = "static"
